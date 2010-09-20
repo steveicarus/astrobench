@@ -1,0 +1,16 @@
+
+# Generic rules
+*.o
+*~
+.DS_Store
+
+
+# QT generated files
+moc_*.cpp
+ui_*.h
+
+# Mac target files
+astrobench.app/*
+astrobench.xcodeproj/*
+build/*
+Info.plist
