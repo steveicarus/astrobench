@@ -11,7 +11,7 @@ unix {
   LIBS +=
 }
 
-SOURCES += main.cpp
+SOURCES += main.cpp SourceImageItem.cpp
 
 FORMS += astrobench.ui
 HEADERS += AstrobenchMain.h

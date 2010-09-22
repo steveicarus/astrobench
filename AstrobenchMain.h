@@ -21,9 +21,12 @@
 
 # include  <qapplication.h>
 # include  <QGraphicsScene>
+# include  <QListWidgetItem>
+# include  <QTreeWidgetItem>
 # include  <vips/vips>
 # include  "ui_astrobench.h"
 
+class SourceImageItem;
 
 class AstrobenchMain : public QMainWindow {
 
@@ -33,7 +36,15 @@ class AstrobenchMain : public QMainWindow {
       AstrobenchMain(QWidget*parent =0);
       ~AstrobenchMain();
 
+	// Display the VImage in the image display window.
       void display_image(vips::VImage&img);
+
+	// Add this image to the image stack.
+      void stack_image(SourceImageItem*img);
+	// Declare this image as a dark-field image.
+      void dark_field_image(SourceImageItem*img);
+	// Remove the image item from any roles and release it.
+      void close_image(SourceImageItem*img);
 
     private:
 	// The user interface...
@@ -54,8 +65,28 @@ class AstrobenchMain : public QMainWindow {
       void source_item_activated_slot_(QListWidgetItem*item);
       void source_item_context_menu_slot_(const QPoint&);
 
+	// Signals from the Stack tab
+      void stack_tree_context_menu_slot_(const QPoint&);
+
 	// Signals from the Image Display tab
       void image_zoom_slider_value_changed_slot_(int value);
+};
+
+class SourceImageItem : public QListWidgetItem {
+
+    public:
+      SourceImageItem(const QString&path, vips::VImage*img);
+      ~SourceImageItem();
+
+      vips::VImage& image() { return *image_; }
+
+      void set_stack_item(QTreeWidgetItem*);
+      inline bool is_stacked (void) const { return stack_item_ != 0; }
+
+    private:
+      vips::VImage*image_;
+
+      QTreeWidgetItem*stack_item_;
 };
 
 #endif

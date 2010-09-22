@@ -40,26 +40,19 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QTableWidget" name="tableWidget">
-          <property name="rowCount">
-           <number>0</number>
+         <widget class="QTreeWidget" name="stack_tree">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
           </property>
-          <property name="columnCount">
-           <number>3</number>
-          </property>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="headerVisible">
+           <bool>false</bool>
+          </attribute>
           <column>
            <property name="text">
-            <string>Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>dX</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>dY</string>
+            <string>Image</string>
            </property>
           </column>
          </widget>
