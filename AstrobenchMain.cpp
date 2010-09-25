@@ -50,6 +50,8 @@ AstrobenchMain::AstrobenchMain(QWidget*parent)
 	// Signals from the Stack tab
       connect(ui.stack_tree, SIGNAL(customContextMenuRequested(const QPoint&)),
 	      SLOT(stack_tree_context_menu_slot_(const QPoint&)));
+      connect(ui.stack_display_button, SIGNAL(clicked()),
+	      SLOT(stack_display_button_slot_()));
 
 	// Signals from the Image Display tab
       connect(ui.image_zoom_slider, SIGNAL(valueChanged(int)),
@@ -115,11 +117,20 @@ void AstrobenchMain::display_image(vips::VImage&img)
 
 void AstrobenchMain::stack_image(SourceImageItem*img)
 {
-      QTreeWidgetItem*item = new QTreeWidgetItem;
-      item->setText(0, img->text());
+      StackedImage*item = new StackedImage(img);
       ui.stack_tree->addTopLevelItem(item);
+      stack_images_.push_front(item);
 
-      img->set_stack_item(item);
+      if (stack_images_.size() == 1) {
+	    item->accumulator = item->image();
+
+      } else {
+	    std::list<StackedImage*>::iterator ptr = stack_images_.begin();
+	    ptr ++;
+	    item->accumulator = item->image() + (*ptr)->image();
+      }
+
+      accumulated_stack_image_ = item->accumulator;
 }
 
 void AstrobenchMain::dark_field_image(SourceImageItem*img)
@@ -180,8 +191,8 @@ void AstrobenchMain::source_item_context_menu_slot_(const QPoint&pos)
       QAction a_dark ("Dark Field", 0);
       QAction a_close("Close",      0);
 
-      a_stack.setEnabled( ! item->is_stacked() );
-      a_dark .setEnabled( ! item->is_stacked() );
+      a_stack.setEnabled( ! item->get_stack_item() );
+      a_dark .setEnabled( ! item->get_stack_item() );
 
       QList<QAction*> menu_list;
       menu_list .append(&a_show);
@@ -209,6 +220,11 @@ void AstrobenchMain::stack_tree_context_menu_slot_(const QPoint&pos)
 {
       QTreeWidgetItem*raw_item = ui.stack_tree->itemAt(pos);
       if (raw_item == 0) return;
+}
+
+void AstrobenchMain::stack_display_button_slot_(void)
+{
+      display_image(accumulated_stack_image_);
 }
 
 void AstrobenchMain::image_zoom_slider_value_changed_slot_(int value)

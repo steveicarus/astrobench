@@ -33,8 +33,20 @@ SourceImageItem::~SourceImageItem()
       if (image_) delete image_;
 }
 
-void SourceImageItem::set_stack_item(QTreeWidgetItem*item)
+void SourceImageItem::set_stack_item(StackedImage*item)
 {
       assert(stack_item_ == 0);
       stack_item_ = item;
+}
+
+StackedImage::StackedImage(SourceImageItem*src)
+: src_(src)
+{
+      setText(0, src_->text());
+      src_->set_stack_item(this);
+}
+
+const vips::VImage& StackedImage::image()
+{
+      return src_->image();
 }

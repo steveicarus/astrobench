@@ -23,10 +23,12 @@
 # include  <QGraphicsScene>
 # include  <QListWidgetItem>
 # include  <QTreeWidgetItem>
+# include  <list>
 # include  <vips/vips>
 # include  "ui_astrobench.h"
 
 class SourceImageItem;
+class StackedImage;
 
 class AstrobenchMain : public QMainWindow {
 
@@ -55,6 +57,14 @@ class AstrobenchMain : public QMainWindow {
       QGraphicsScene*display_scene_;
       QGraphicsPixmapItem*display_pixmap_;
 
+	// The main items in the image stack are listed here.
+      std::list<StackedImage*>stack_images_;
+
+	// The images in the image stack are added together into this
+	// accumulated sum. The type of this image depends on the
+	// types of the input images.
+      vips::VImage accumulated_stack_image_;
+
 	//void closeEvent(QCloseEvent*);
 
     private slots:
@@ -67,11 +77,18 @@ class AstrobenchMain : public QMainWindow {
 
 	// Signals from the Stack tab
       void stack_tree_context_menu_slot_(const QPoint&);
+      void stack_display_button_slot_();
 
 	// Signals from the Image Display tab
       void image_zoom_slider_value_changed_slot_(int value);
 };
 
+/*
+ * The SourceImageItem is the starting point for an image. When an
+ * image is loaded, a SourceImageItem is created to hold the image and
+ * this item is placed in the source items list. All references to the
+ * input image ultimately go back to this instance.
+ */
 class SourceImageItem : public QListWidgetItem {
 
     public:
@@ -80,13 +97,39 @@ class SourceImageItem : public QListWidgetItem {
 
       vips::VImage& image() { return *image_; }
 
-      void set_stack_item(QTreeWidgetItem*);
-      inline bool is_stacked (void) const { return stack_item_ != 0; }
+      void set_stack_item(StackedImage*);
+      StackedImage*get_stack_item() { return stack_item_; }
 
     private:
       vips::VImage*image_;
 
-      QTreeWidgetItem*stack_item_;
+      StackedImage*stack_item_;
+};
+
+/*
+ * The StackedImage instance represents images that are put into the
+ * image stack. This instance refers back to the SourceImageItem that
+ * is the source data for the item, and it is inserted into the stack
+ * tree as a top-level item.
+ */
+class StackedImage : public QTreeWidgetItem {
+
+    public:
+      StackedImage(SourceImageItem*src);
+
+	// This returns a reference to the internal image that is the
+	// prepared and ready image for this image. Any tweaks to the
+	// source image to get here are applied at this point.
+      const vips::VImage&image();
+
+    public:
+	// This public member is used by the stacker as an accumulator
+	// and scratch sum. This class does not use this member in any way.
+      vips::VImage accumulator;
+
+    private:
+	// This is the source image item, raw.
+      SourceImageItem*src_;
 };
 
 #endif
