@@ -50,6 +50,8 @@ AstrobenchMain::AstrobenchMain(QWidget*parent)
 	// Signals from the Stack tab
       connect(ui.stack_tree, SIGNAL(customContextMenuRequested(const QPoint&)),
 	      SLOT(stack_tree_context_menu_slot_(const QPoint&)));
+      connect(ui.stack_save_button, SIGNAL(clicked()),
+	      SLOT(stack_save_button_slot_()));
       connect(ui.stack_display_button, SIGNAL(clicked()),
 	      SLOT(stack_display_button_slot_()));
 
@@ -133,6 +135,54 @@ void AstrobenchMain::stack_image(SourceImageItem*img)
       accumulated_stack_image_ = item->accumulator;
 }
 
+void AstrobenchMain::unstack_image(SourceImageItem*img)
+{
+      StackedImage*item = img->get_stack_item();
+      assert(item);
+
+      std::list<StackedImage*>::iterator ptr = stack_images_.begin();
+      while (item != *ptr) {
+	    assert(ptr != stack_images_.end());
+	    ptr ++;
+      }
+
+      if (stack_images_.size() == 1) {
+	    stack_images_.erase(ptr);
+	    accumulated_stack_image_ = vips::VImage();
+
+      } else if (ptr == stack_images_.begin()) {
+	    stack_images_.erase(ptr);
+	    ptr = stack_images_.begin();
+	    accumulated_stack_image_ = (*ptr)->accumulator;
+
+      } else {
+	    std::list<StackedImage*>::iterator prev = ptr;
+	    prev --;
+	    stack_images_.erase(ptr);
+
+	    std::list<StackedImage*>::iterator next = prev;
+	    next ++;
+	      // Restack the images before the image that has been
+	      // removed. Step all the way to the beginning of the list.
+	    for ( ;; ) {
+		  if (next == stack_images_.end())
+			(*prev)->accumulator = (*prev)->image();
+		  else
+			(*prev)->accumulator = (*prev)->image() + (*next)->accumulator;
+
+		  if (prev == stack_images_.begin())
+			break;
+
+		  prev --;
+		  next --;
+	    }
+
+	    accumulated_stack_image_ = (*prev)->accumulator;
+      }
+
+      delete item;
+}
+
 void AstrobenchMain::dark_field_image(SourceImageItem*img)
 {
 }
@@ -187,11 +237,10 @@ void AstrobenchMain::source_item_context_menu_slot_(const QPoint&pos)
       if (item == 0) return;
 
       QAction a_show ("Show",       0);
-      QAction a_stack("Stack",      0);
+      QAction a_stack(item->get_stack_item()? "UN-Stack" : "Stack", 0);
       QAction a_dark ("Dark Field", 0);
       QAction a_close("Close",      0);
 
-      a_stack.setEnabled( ! item->get_stack_item() );
       a_dark .setEnabled( ! item->get_stack_item() );
 
       QList<QAction*> menu_list;
@@ -206,7 +255,10 @@ void AstrobenchMain::source_item_context_menu_slot_(const QPoint&pos)
 	    display_image(item->image());
 
       } else if (hit == &a_stack) {
-	    stack_image(item);
+	    if (item->get_stack_item())
+		  unstack_image(item);
+	    else
+		  stack_image(item);
 
       } else if (hit == &a_dark) {
 	    dark_field_image(item);
@@ -220,6 +272,10 @@ void AstrobenchMain::stack_tree_context_menu_slot_(const QPoint&pos)
 {
       QTreeWidgetItem*raw_item = ui.stack_tree->itemAt(pos);
       if (raw_item == 0) return;
+}
+
+void AstrobenchMain::stack_save_button_slot_(void)
+{
 }
 
 void AstrobenchMain::stack_display_button_slot_(void)

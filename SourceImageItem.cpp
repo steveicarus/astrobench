@@ -35,7 +35,7 @@ SourceImageItem::~SourceImageItem()
 
 void SourceImageItem::set_stack_item(StackedImage*item)
 {
-      assert(stack_item_ == 0);
+      assert(stack_item_ == 0 || item == 0);
       stack_item_ = item;
 }
 
@@ -44,6 +44,11 @@ StackedImage::StackedImage(SourceImageItem*src)
 {
       setText(0, src_->text());
       src_->set_stack_item(this);
+}
+
+StackedImage::~StackedImage()
+{
+      src_->set_stack_item(0);
 }
 
 const vips::VImage& StackedImage::image()

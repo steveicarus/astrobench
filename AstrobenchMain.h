@@ -43,6 +43,7 @@ class AstrobenchMain : public QMainWindow {
 
 	// Add this image to the image stack.
       void stack_image(SourceImageItem*img);
+      void unstack_image(SourceImageItem*img);
 	// Declare this image as a dark-field image.
       void dark_field_image(SourceImageItem*img);
 	// Remove the image item from any roles and release it.
@@ -77,6 +78,7 @@ class AstrobenchMain : public QMainWindow {
 
 	// Signals from the Stack tab
       void stack_tree_context_menu_slot_(const QPoint&);
+      void stack_save_button_slot_();
       void stack_display_button_slot_();
 
 	// Signals from the Image Display tab
@@ -116,6 +118,7 @@ class StackedImage : public QTreeWidgetItem {
 
     public:
       StackedImage(SourceImageItem*src);
+      ~StackedImage();
 
 	// This returns a reference to the internal image that is the
 	// prepared and ready image for this image. Any tweaks to the
