@@ -79,6 +79,7 @@ class AstrobenchMain : public QMainWindow {
 	// Signals from the Stack tab
       void stack_tree_context_menu_slot_(const QPoint&);
       void stack_save_button_slot_();
+      void stack_align_button_slot_();
       void stack_display_button_slot_();
 
 	// Signals from the Image Display tab
@@ -120,10 +121,15 @@ class StackedImage : public QTreeWidgetItem {
       StackedImage(SourceImageItem*src);
       ~StackedImage();
 
+	// Calculate the offset of this image relative that image.
+      void calculate_offset(const StackedImage*that);
+
 	// This returns a reference to the internal image that is the
 	// prepared and ready image for this image. Any tweaks to the
 	// source image to get here are applied at this point.
-      const vips::VImage&image();
+      const vips::VImage&image(void);
+
+      const vips::VImage&fwfft(void);
 
     public:
 	// This public member is used by the stacker as an accumulator
@@ -133,6 +139,22 @@ class StackedImage : public QTreeWidgetItem {
     private:
 	// This is the source image item, raw.
       SourceImageItem*src_;
+
+	// shift values. This is the location of the point in the
+	// SourceImage that is shifted to the upper-left corner. So
+	// for example, if shift_x_ is >0, the image is shifted LEFT
+	// into the target.
+      int shift_x_, shift_y_;
+
+	// This variable holds the processed image, shifted to reflect
+	// the desired properties. If there is no shift, then this is
+	// not used.
+      vips::VImage processed_;
+#if 0
+	// We sometimes want the forward FFT version of the image, and
+	// not the image itself. Cache that image here.
+      vips::VImage fwfft_;
+#endif
 };
 
 #endif

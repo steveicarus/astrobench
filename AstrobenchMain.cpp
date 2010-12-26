@@ -52,6 +52,8 @@ AstrobenchMain::AstrobenchMain(QWidget*parent)
 	      SLOT(stack_tree_context_menu_slot_(const QPoint&)));
       connect(ui.stack_save_button, SIGNAL(clicked()),
 	      SLOT(stack_save_button_slot_()));
+      connect(ui.stack_align_button, SIGNAL(clicked()),
+	      SLOT(stack_align_button_slot_()));
       connect(ui.stack_display_button, SIGNAL(clicked()),
 	      SLOT(stack_display_button_slot_()));
 
@@ -117,6 +119,17 @@ void AstrobenchMain::display_image(vips::VImage&img)
       display_pixmap_->show();
 }
 
+/*
+ * The stack_image and unstack_image methods add a source image to the
+ * image stack, or remove that image from the stack.
+ *
+ * The image stack is an accumulated sum of images. The image stack
+ * makes use of the "accumulator" member of each image to keep a
+ * running sum of the current image with the accumulated previous
+ * image. The stack is managed with a std::list, with the beginning of
+ * the list being the top of the stack. Images are added to the top of
+ * the stack, although they can be removed from anywhere in the stack.
+ */
 void AstrobenchMain::stack_image(SourceImageItem*img)
 {
       StackedImage*item = new StackedImage(img);
@@ -124,12 +137,24 @@ void AstrobenchMain::stack_image(SourceImageItem*img)
       stack_images_.push_front(item);
 
       if (stack_images_.size() == 1) {
+	      // If this is the only image, then its accumulated value
+	      // is the image itself.
 	    item->accumulator = item->image();
 
       } else {
+#if 1
+	      // Calculate the offset of this image from the reference
+	      // image, which is by definition the image in the bottom
+	      // of the stack.
+	    StackedImage*ref = stack_images_.back();
+	    item->calculate_offset(ref);
+#endif
+	      // There are existing images in the stack, so its
+	      // accumulated value is the image itself plus the
+	      // accumulated value of the rest of the stack.
 	    std::list<StackedImage*>::iterator ptr = stack_images_.begin();
 	    ptr ++;
-	    item->accumulator = item->image() + (*ptr)->image();
+	    item->accumulator = item->image() + (*ptr)->accumulator;
       }
 
       accumulated_stack_image_ = item->accumulator;
@@ -276,6 +301,17 @@ void AstrobenchMain::stack_tree_context_menu_slot_(const QPoint&pos)
 
 void AstrobenchMain::stack_save_button_slot_(void)
 {
+}
+
+void AstrobenchMain::stack_align_button_slot_(void)
+{
+	// If there are no image to align to a reference image, then
+	// do nothing.
+      if (stack_images_.size() < 2)
+	    return;
+
+	// XXXX NOT IMPLEMENTED
+      return;
 }
 
 void AstrobenchMain::stack_display_button_slot_(void)
