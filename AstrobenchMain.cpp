@@ -94,7 +94,8 @@ static void draw_from_gray(QImage&dst, vips::VImage&img)
 
 void AstrobenchMain::display_image(vips::VImage&img)
 {
-      vips::VImage display_image = img.scale();
+      double use_gamma = ui.image_display_gamma->value();
+      vips::VImage display_image = img.scale().gammacorrect(use_gamma);
       QImage tmp (display_image.Xsize(), display_image.Ysize(), QImage::Format_RGB32);
 
       int planes = display_image.Bands();

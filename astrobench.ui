@@ -65,6 +65,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QPushButton" name="stack_save_button">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Save to Image</string>
              </property>
@@ -85,6 +88,9 @@
            </item>
            <item>
             <widget class="QPushButton" name="stack_align_button">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Auto-Align Stack</string>
              </property>
@@ -126,7 +132,23 @@
            </spacer>
           </item>
           <item>
+           <widget class="QDoubleSpinBox" name="image_display_gamma">
+            <property name="toolTip">
+             <string>Gamma correction value</string>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QSlider" name="image_zoom_slider">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
