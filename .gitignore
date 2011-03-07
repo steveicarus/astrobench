@@ -10,7 +10,7 @@ moc_*.cpp
 ui_*.h
 
 # Mac target files
-astrobench.app/*
-astrobench.xcodeproj/*
-build/*
-Info.plist
+src/astrobench.app/*
+src/astrobench.xcodeproj/*
+src/build/*
+src/Info.plist
