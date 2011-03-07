@@ -1,6 +1,6 @@
 
 CONFIG += qt
-#CONFIG += debug
+CONFIG += debug
 
 # On Mac OS X, we rely on a fink installation for some libraries.
 macx {
@@ -11,11 +11,16 @@ unix {
   LIBS +=
 }
 
-SOURCES += main.cpp SourceImageItem.cpp
+SOURCES += main.cpp
 
+# Describe the main window
 FORMS += astrobench.ui
 HEADERS += AstrobenchMain.h
 SOURCES += AstrobenchMain.cpp
 
-TARGET = astrobench
+# Describe the StackItem widget
+FORMS += stackitem.ui
+HEADERS += StackItemWidget.h
+SOURCES += StackItemWidget.cpp
 
+TARGET = astrobench
