@@ -43,6 +43,9 @@ class StackItemWidget  : public QWidget {
 	// argument, which is expected to the the previous top of the stack.
       void calculate_stack_from(StackItemWidget*that);
 
+	// Statistics about the accumulated image.
+      unsigned accum_pixel_max();
+
     private slots:
       void display_raw_slot_(void);
       void display_aligned_slot_(void);
@@ -68,6 +71,7 @@ class StackItemWidget  : public QWidget {
 	// The accumulated is the processed_ image added to the
 	// previously accumulated images. It is this point in the stack.
       vips::VImage accumulated_;
+      vips::VDMask accumulated_stats_;
 };
 
 #endif

@@ -44,9 +44,17 @@ class AstrobenchMain : public QMainWindow {
 	// The user interface...
       Ui::AstrobenchMainWidget ui;
 
+	// This is the initial number of pages in the stack box. It is
+	// used to know where stack images can go.
+      int stack_box_count_;
+
 	// Variables for managing the image display window.
       QGraphicsScene*display_scene_;
       QGraphicsPixmapItem*display_pixmap_;
+
+      vips::VImage tone_map_lut_;
+      QGraphicsScene*tone_map_lut_scene_;
+      QGraphicsPixmapItem*tone_map_lut_pixmap_;
 
       vips::VImage*next_image_;
       QString next_path_;
@@ -55,6 +63,9 @@ class AstrobenchMain : public QMainWindow {
     private slots:
       void open_next_image_button_slot_();
       void stack_next_image_button_slot_();
+
+      void tone_map_calculate_slot_();
+      void tone_map_apply_slot_();
 };
 
 #endif

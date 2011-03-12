@@ -44,6 +44,7 @@ void StackItemWidget::set_image(const QString&path, const vips::VImage&img)
       image_ = img;
       processed_ = image_;
       accumulated_ = image_;
+      accumulated_stats_ = accumulated_.stats();
       ui.stack_item_path->setText(path);
       ui.stack_item_path->setToolTip(path);
 }
@@ -126,11 +127,18 @@ void StackItemWidget::calculate_offset_from(StackItemWidget*that)
       processed_ = image_.extract_area(tx, ty, tw, th)
 	              .embed(0, px, py, image_.Xsize(), image_.Ysize());
       accumulated_ = processed_;
+      accumulated_stats_ = accumulated_.stats();
 }
 
 void StackItemWidget::calculate_stack_from(StackItemWidget*that)
 {
       accumulated_ = processed_ + that->accumulated_;
+      accumulated_stats_ = accumulated_.stats();
+}
+
+unsigned StackItemWidget::accum_pixel_max()
+{
+      return accumulated_stats_(1,0);
 }
 
 void StackItemWidget::display_raw_slot_(void)
