@@ -48,6 +48,10 @@ AstrobenchMain::AstrobenchMain(QWidget*parent)
       tone_map_lut_scene_ = new QGraphicsScene(ui.tone_map_graph);
       ui.tone_map_graph->setScene(tone_map_lut_scene_);
 
+	// Signals from the File menu
+      connect(ui.actionExport, SIGNAL(triggered()),
+	      SLOT(menu_export_slot_()));
+
 	// Signals from the Stack Processing tab
       connect(ui.open_next_image_button, SIGNAL(clicked()),
 	      SLOT(open_next_image_button_slot_()));
@@ -68,6 +72,22 @@ AstrobenchMain::~AstrobenchMain()
       for (list<StackItemWidget*>::const_iterator cur = stack_.begin()
 		 ; cur != stack_.end() ; ++cur) {
 	    delete *cur;
+      }
+}
+
+void AstrobenchMain::menu_export_slot_(void)
+{
+	// If there is no stack, then give up now.
+      if (stack_.size() == 0)
+	    return;
+
+      QString types = tr("Images (*.tif *.tiff)");
+      QString path = QFileDialog::getSaveFileName(this, tr("Save Image File"),
+						  QString(), types);
+
+      if (path.endsWith(".tif") || path.endsWith(".tiff")) {
+	    stack_top_.vips2tiff((char*)path.toStdString().c_str());
+      } else {
       }
 }
 
@@ -143,7 +163,7 @@ void AstrobenchMain::tone_map_calculate_slot_()
 
       QString text;
 
-      unsigned long pixel_max = item->accum_pixel_max();
+      unsigned long pixel_max = item->accumulated_pixel_max();
       text = QString("%1").arg(pixel_max);
       ui.tone_map_input_max->setText(text);
 
@@ -221,7 +241,8 @@ void AstrobenchMain::tone_map_apply_slot_()
       if (stack_.size() == 0)
 	    return;
 
-      stack_.front()->display_stacked_mapped();
+      stack_top_ = tone_map(stack_.front()->accumulated_image());
+      display_image(stack_top_);
 }
 
 static void draw_from_rgb(QImage&dst, vips::VImage&img)

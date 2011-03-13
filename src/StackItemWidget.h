@@ -45,11 +45,8 @@ class StackItemWidget  : public QWidget {
       void calculate_stack_from(StackItemWidget*that);
 
 	// Statistics about the accumulated image.
-      unsigned accum_pixel_max();
-
-	// Use the passed lut as a tone map, and display the stacked
-	// version of this image.
-      void display_stacked_mapped(void);
+      const vips::VImage& accumulated_image() const;
+      unsigned accumulated_pixel_max();
 
     private slots:
       void display_raw_slot_(void);

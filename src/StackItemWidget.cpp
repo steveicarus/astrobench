@@ -138,15 +138,14 @@ void StackItemWidget::calculate_stack_from(StackItemWidget*that)
       accumulated_stats_ = accumulated_.stats();
 }
 
-unsigned StackItemWidget::accum_pixel_max()
+const VImage& StackItemWidget::accumulated_image(void) const
 {
-      return accumulated_stats_(1,0);
+      return accumulated_;
 }
 
-void StackItemWidget::display_stacked_mapped(void)
+unsigned StackItemWidget::accumulated_pixel_max()
 {
-      VImage tmp = astromain_->tone_map(accumulated_);
-      astromain_->display_image(tmp);
+      return accumulated_stats_(1,0);
 }
 
 void StackItemWidget::display_raw_slot_(void)

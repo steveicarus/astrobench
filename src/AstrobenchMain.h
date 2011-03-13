@@ -66,8 +66,12 @@ class AstrobenchMain : public QMainWindow {
       QGraphicsScene*tone_map_lut_scene_;
       QGraphicsPixmapItem*tone_map_lut_pixmap_;
 
+	// next_image_ is a temporary space for the next image to be
+	// loaded, before it is disposed of in some way.
       vips::VImage*next_image_;
       QString next_path_;
+
+      vips::VImage stack_top_;
       std::list<StackItemWidget*> stack_;
 
     private: // Image processing function implementations
@@ -75,9 +79,12 @@ class AstrobenchMain : public QMainWindow {
       template <class T> static void do_tone_map_(void*pin, void*pout, int wid, void*a, void*b);
 
     private slots:
+	// menu action slots
+      void menu_export_slot_();
+	// Stack image tab slots
       void open_next_image_button_slot_();
       void stack_next_image_button_slot_();
-
+	// Tone map tab slots
       void tone_map_calculate_slot_();
       void tone_map_apply_slot_();
 };
