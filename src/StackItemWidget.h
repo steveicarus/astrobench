@@ -34,6 +34,7 @@ class StackItemWidget  : public QWidget {
       StackItemWidget(AstrobenchMain*am, QWidget*parent =0);
       ~StackItemWidget();
 
+	// Set the raw image for this item.
       void set_image(const QString&path, const vips::VImage&img);
 
 	// Calculate the offset of this image from the image argument,
@@ -45,6 +46,10 @@ class StackItemWidget  : public QWidget {
 
 	// Statistics about the accumulated image.
       unsigned accum_pixel_max();
+
+	// Use the passed lut as a tone map, and display the stacked
+	// version of this image.
+      void display_stacked_mapped(void);
 
     private slots:
       void display_raw_slot_(void);

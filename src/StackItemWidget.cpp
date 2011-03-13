@@ -21,6 +21,8 @@
 # include  "AstrobenchMain.h"
 # include  <cassert>
 
+using namespace vips;
+
 StackItemWidget::StackItemWidget(AstrobenchMain*am, QWidget*parent)
     : QWidget(parent), astromain_(am)
 {
@@ -139,6 +141,12 @@ void StackItemWidget::calculate_stack_from(StackItemWidget*that)
 unsigned StackItemWidget::accum_pixel_max()
 {
       return accumulated_stats_(1,0);
+}
+
+void StackItemWidget::display_stacked_mapped(void)
+{
+      VImage tmp = astromain_->tone_map(accumulated_);
+      astromain_->display_image(tmp);
 }
 
 void StackItemWidget::display_raw_slot_(void)

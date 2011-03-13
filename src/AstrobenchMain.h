@@ -25,6 +25,7 @@
 # include  "ui_astrobench.h"
 # include  <vips/vips>
 # include  <list>
+# include  <vector>
 
 class QGraphicsScene;
 class QGraphicsPixmapItem;
@@ -40,6 +41,14 @@ class AstrobenchMain : public QMainWindow {
 
       void display_image(vips::VImage&img);
 
+    public: // Image processing functions
+
+	// This method applies the tone map to an image. It uses the
+	// tone_map_lut_data_ member below to perform the actual
+	// transformation. The input is unsigned integral, the output
+	// is USHORT.
+      vips::VImage tone_map(vips::VImage) throw (vips::VError);
+
     private:
 	// The user interface...
       Ui::AstrobenchMainWidget ui;
@@ -52,13 +61,18 @@ class AstrobenchMain : public QMainWindow {
       QGraphicsScene*display_scene_;
       QGraphicsPixmapItem*display_pixmap_;
 
-      vips::VImage tone_map_lut_;
+	// Variables for managing tone mapping.
+      std::vector<unsigned short>tone_map_lut_data_;
       QGraphicsScene*tone_map_lut_scene_;
       QGraphicsPixmapItem*tone_map_lut_pixmap_;
 
       vips::VImage*next_image_;
       QString next_path_;
       std::list<StackItemWidget*> stack_;
+
+    private: // Image processing function implementations
+
+      template <class T> static void do_tone_map_(void*pin, void*pout, int wid, void*a, void*b);
 
     private slots:
       void open_next_image_button_slot_();

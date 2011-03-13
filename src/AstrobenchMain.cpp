@@ -155,10 +155,11 @@ void AstrobenchMain::tone_map_calculate_slot_()
 
 	// Create a LUT that is big enough to map the range of the
 	// accumulated image, to the 16bit target range.
-      unsigned short*lut_data = new unsigned short[3 * pixel_max];
+      if (tone_map_lut_data_.size() < (3*pixel_max))
+	    tone_map_lut_data_.resize(3 * pixel_max);
 
       for (unsigned idx = 0 ; idx < pixel_max ; idx += 1) {
-	    unsigned short*lut_ptr = lut_data + 3*idx;
+	    unsigned short*lut_ptr = & tone_map_lut_data_[3*idx];
 
 	    unsigned long tmp = pow((double)idx / (double)pixel_max, gamma) * 0x10000;
 	    if (tmp > 0xffff) tmp = 0xffff;
@@ -167,9 +168,6 @@ void AstrobenchMain::tone_map_calculate_slot_()
 	    lut_ptr[2] = tmp;
       }
 
-	// Put the lut into a VImage in a way that it can be garbate
-	// collected. Then drop the malually allocated lut buffer.
-      tone_map_lut_ = VImage(lut_data, pixel_max, 1, 3, VImage::FMTUSHORT);
 
       QSize lut_image_size = ui.tone_map_graph->size();
       int use_width = lut_image_size.width() - 2;
@@ -181,9 +179,9 @@ void AstrobenchMain::tone_map_calculate_slot_()
 	    if (ptr >= pixel_max) ptr = pixel_max-1;
 	    ptr *= 3;
 
-	    int valr = lut_data[ptr+0];
-	    int valg = lut_data[ptr+1];
-	    int valb = lut_data[ptr+2];
+	    int valr = tone_map_lut_data_[ptr+0];
+	    int valg = tone_map_lut_data_[ptr+1];
+	    int valb = tone_map_lut_data_[ptr+2];
 
 	    valr = valr * use_height / 0x10000;
 	    valg = valg * use_height / 0x10000;
@@ -216,11 +214,14 @@ void AstrobenchMain::tone_map_calculate_slot_()
 
       tone_map_lut_pixmap_ = tone_map_lut_scene_->addPixmap(QPixmap::fromImage(lut_image));
       tone_map_lut_pixmap_->show();
-      delete[]lut_data;
 }
 
 void AstrobenchMain::tone_map_apply_slot_()
 {
+      if (stack_.size() == 0)
+	    return;
+
+      stack_.front()->display_stacked_mapped();
 }
 
 static void draw_from_rgb(QImage&dst, vips::VImage&img)
@@ -251,8 +252,7 @@ static void draw_from_gray(QImage&dst, vips::VImage&img)
 
 void AstrobenchMain::display_image(vips::VImage&img)
 {
-      double display_gamma = 1 / ui.tools_gamma->value();
-      vips::VImage display_image = img.scale().gammacorrect(display_gamma);
+      vips::VImage display_image = img.scale();
       QImage tmp (display_image.Xsize(), display_image.Ysize(), QImage::Format_RGB32);
 
       int planes = display_image.Bands();

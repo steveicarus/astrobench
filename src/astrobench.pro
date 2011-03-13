@@ -16,7 +16,7 @@ SOURCES += main.cpp
 # Describe the main window
 FORMS += astrobench.ui
 HEADERS += AstrobenchMain.h
-SOURCES += AstrobenchMain.cpp
+SOURCES += AstrobenchMain.cpp proc_tone_map.cpp
 
 # Describe the StackItem widget
 FORMS += stackitem.ui
