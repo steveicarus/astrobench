@@ -8,7 +8,8 @@ macx {
   LIBS += -L/sw/lib -lvipsCC -lvips
 }
 unix {
-  LIBS +=
+  INCLUDEPATH += /usr/include/glib-2.0 /usr/lib64/glib-2.0/include
+  LIBS += -lvipsCC -lvips -lpthread
 }
 
 SOURCES += main.cpp

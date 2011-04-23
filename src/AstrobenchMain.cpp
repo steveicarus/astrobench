@@ -25,6 +25,7 @@
 # include  <QString>
 # include  "AstrobenchMain.h"
 # include  "StackItemWidget.h"
+# include  <cassert>
 
 using namespace vips;
 using namespace std;

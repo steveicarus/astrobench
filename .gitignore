@@ -14,3 +14,7 @@ src/astrobench.app/*
 src/astrobench.xcodeproj/*
 src/build/*
 src/Info.plist
+
+# Linux target files
+src/Makefile
+src/astrobench

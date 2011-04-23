@@ -19,6 +19,7 @@
 
 # include  "StackItemWidget.h"
 # include  "AstrobenchMain.h"
+# include  <stdio.h>
 # include  <cassert>
 
 using namespace vips;

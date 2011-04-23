@@ -18,10 +18,14 @@
  */
 
 # include  <qapplication.h>
+# include  <vips/vips.h>
 # include  "AstrobenchMain.h"
 
 int main(int argc, char*argv[])
 {
+      if (im_init_world(argv[0]))
+	    return -1;
+
       QApplication app (argc, argv);
 
       AstrobenchMain*widget = new AstrobenchMain;
