@@ -50,6 +50,14 @@ void StackItemWidget::set_image(const QString&path, const vips::VImage&img)
       accumulated_stats_ = accumulated_.stats();
       ui.stack_item_path->setText(path);
       ui.stack_item_path->setToolTip(path);
+
+      vips::VImage ref_tmp;
+      if (image_.Bands() == 3)
+	    ref_tmp = image_.extract_bands(1,1);
+      else
+	    ref_tmp = image_.extract_bands(0,1);
+
+      image_fwfft_ = ref_tmp.fwfft();
 }
 
 void StackItemWidget::calculate_offset_from(StackItemWidget*that)
@@ -57,24 +65,8 @@ void StackItemWidget::calculate_offset_from(StackItemWidget*that)
       assert(image_.Xsize() == that->image_.Xsize());
       assert(image_.Ysize() == that->image_.Ysize());
 
-	// Use only the green plane of color images, or the first
-	// plane of gray/other images. This should get us good enough
-	// alignment with much less processing effort.
-      vips::VImage ref_tmp;
-      if (that->image_.Bands() == 3) {
-	    ref_tmp = that->image_.extract_bands(1,1);
-      } else {
-	    ref_tmp = that->image_.extract_bands(0,1);
-      }
-
-      vips::VImage this_tmp;
-      if (image_.Bands() == 3) {
-	    this_tmp = image_.extract_bands(1,1);
-      } else {
-	    this_tmp = image_.extract_bands(0,1);
-      }
-
-      vips::VImage corr = ref_tmp.phasecor_fft(this_tmp);
+      vips::VImage xphase = that->image_fwfft_.cross_phase(image_fwfft_);
+      vips::VImage corr = xphase.invfftr();
 
       double xpos, ypos;
 

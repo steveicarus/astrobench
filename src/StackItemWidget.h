@@ -62,6 +62,11 @@ class StackItemWidget  : public QWidget {
 	// This is the original image, passed in from the creator.
       vips::VImage image_;
 
+	// This is a fwFFT version of the image, that can be used for
+	// phase correlation. We may need it multiple times, so this
+	// acts as a cache.
+      vips::VImage image_fwfft_;
+
 	// Amount of shift to line up with the base image. These are
 	// calculated by calculate_offset_from().
       int shift_x_, shift_y_;
