@@ -194,6 +194,7 @@ void AstrobenchMain::tone_map_calculate_slot_()
       int use_width = lut_image_size.width() - 2;
       int use_height = lut_image_size.height() - 2;
       QImage lut_image (use_width, use_height, QImage::Format_RGB32);
+      lut_image.fill(0);
 
       for (int idx = 0 ; idx < use_width ; idx += 1) {
 	    int ptr = idx * pixel_max / use_width;
