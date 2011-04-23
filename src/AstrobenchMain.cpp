@@ -298,20 +298,4 @@ void AstrobenchMain::display_image(vips::VImage&img)
 
       display_pixmap_ = display_scene_->addPixmap(QPixmap::fromImage(tmp));
       display_pixmap_->show();
-
-      VDMask stats = img.stats();
-
-      QString text = QString("%1 x %2 (x%3)")
-	    .arg(img.Xsize())
-	    .arg(img.Ysize())
-	    .arg(img.Bands());
-      ui.stats_dimensions->setText(text);
-
-      long val = stats(0,0);
-      text = QString("%1 (0x%2)").arg(val,0,10).arg(val,0,16);
-      ui.stats_min->setText(text);
-
-      val = stats(1,0);
-      text = QString("%1 (0x%2)").arg(val,0,10).arg(val,0,16);
-      ui.stats_max->setText(text);
 }
