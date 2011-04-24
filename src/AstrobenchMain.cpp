@@ -88,6 +88,25 @@ AstrobenchMain::~AstrobenchMain()
       }
 }
 
+unsigned AstrobenchMain::choose_unique_id_(void)
+{
+      if (ident_map_.size() == 0)
+	    return 0;
+
+	// This assumes that the iterator steps through the map in
+	// sorted order. We stan forward looking for a gap in the
+	// identifier numbers, and return the value of the first
+	// gap. This way we keep identifiers small.
+      unsigned cur_guess = 0;
+      map<unsigned,StackItemWidget*>::const_iterator cur = ident_map_.begin();
+      while (cur != ident_map_.end() && cur->first == cur_guess) {
+	    cur_guess += 1;
+	    ++ cur;
+      }
+
+      return cur_guess;
+}
+
 void AstrobenchMain::menu_save_image_slot_(void)
 {
 	// If there is no stack, then give up now.
@@ -132,8 +151,22 @@ void AstrobenchMain::stack_next_image_button_slot_()
       if (next_image_ == 0)
 	    return;
 
-	// Convert the next_image_ pointer to a new StackImageWidget.
-      StackItemWidget*cur = new StackItemWidget(this);
+      if (project_ == 0) {
+	    QMessageBox::information(this, tr("No Project"),
+				     tr("Create or Open a project first."));
+	    return;
+      }
+
+      unsigned item_id = choose_unique_id_();
+
+	// Create a new StackItemWidget to hold the current image. Map
+	// that widget to an identifier code, and write that code to
+	// the project settings.
+      StackItemWidget*cur = new StackItemWidget(this, item_id);
+      ident_map_[cur->ident()] = cur;
+      project_->setValue(QString("items/%1").arg(cur->ident()), "present");
+
+	// Move the image to the StackItemWidget.
       cur->set_image(next_path_, *next_image_);
       next_image_ = 0;
 
@@ -148,6 +181,7 @@ void AstrobenchMain::stack_next_image_button_slot_()
       QString label;
       if (base == 0) {
 	    label = tr("Base image");
+	    project_->setValue("base_image", cur->ident());
       } else {
 	    unsigned pos = stack_.size() - 1;
 	    label = QString("Stack item %1").arg(pos);

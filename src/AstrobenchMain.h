@@ -41,6 +41,9 @@ class AstrobenchMain : public QMainWindow {
       AstrobenchMain(QWidget*parent =0);
       ~AstrobenchMain();
 
+	// This is the directory where all the project files are to go.
+      const QDir& project_root() const { return project_path_; }
+
       void display_image(vips::VImage&img);
 
     public: // Image processing functions
@@ -63,6 +66,12 @@ class AstrobenchMain : public QMainWindow {
 	// This is the initial number of pages in the stack box. It is
 	// used to know where stack images can go.
       int stack_box_count_;
+
+	// Keep a map of identifiers to the StaciItemWidget that they
+	// represent. This allows us to quickly choose new identifiers
+	// when we create items.
+      std::map<unsigned,StackItemWidget*>ident_map_;
+      unsigned choose_unique_id_(void);
 
 	// Variables for managing the image display window.
       QGraphicsScene*display_scene_;

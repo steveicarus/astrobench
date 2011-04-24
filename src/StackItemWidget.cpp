@@ -24,10 +24,12 @@
 
 using namespace vips;
 
-StackItemWidget::StackItemWidget(AstrobenchMain*am, QWidget*parent)
-    : QWidget(parent), astromain_(am)
+StackItemWidget::StackItemWidget(AstrobenchMain*am, unsigned id, QWidget*parent)
+: QWidget(parent), astromain_(am)
 {
       ui.setupUi(this);
+
+      ident_ = id;
 
 	// Display buttons
       connect(ui.stack_item_display_raw, SIGNAL(clicked()),
@@ -42,9 +44,14 @@ StackItemWidget::~StackItemWidget()
 {
 }
 
-void StackItemWidget::set_image(const QString&path, const vips::VImage&img)
+void StackItemWidget::set_image(const QString&path, vips::VImage img)
 {
-      image_ = img;
+      QString fname = QString("item.%1.base.v").arg(ident_);
+      QString fpath = astromain_->project_root().filePath(fname);
+      VImage file (fpath.toStdString().c_str(), "w");
+      img.write(file);
+
+      image_ = file;
       processed_ = image_;
       accumulated_ = image_;
       accumulated_stats_ = accumulated_.stats();

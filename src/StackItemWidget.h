@@ -31,11 +31,13 @@ class StackItemWidget  : public QWidget {
       Q_OBJECT;
 
     public:
-      StackItemWidget(AstrobenchMain*am, QWidget*parent =0);
+      StackItemWidget(AstrobenchMain*am, unsigned ident, QWidget*parent =0);
       ~StackItemWidget();
 
+      unsigned ident() const { return ident_; }
+
 	// Set the raw image for this item.
-      void set_image(const QString&path, const vips::VImage&img);
+      void set_image(const QString&path, vips::VImage img);
 
 	// Calculate the offset of this image from the image argument,
 	// which is expected to the be base image.
@@ -58,6 +60,9 @@ class StackItemWidget  : public QWidget {
 
 	// This is a pointer to the main window. Use it for global actions.
       AstrobenchMain*astromain_;
+
+	// Unique identifier for this item.
+      unsigned ident_;
 
 	// This is the original image, passed in from the creator.
       vips::VImage image_;
