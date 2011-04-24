@@ -18,10 +18,12 @@
  */
 
 # include  <qapplication.h>
+# include  <QDir>
 # include  <QDoubleSpinBox>
 # include  <QFileDialog>
 # include  <QGraphicsPixmapItem>
 # include  <QGraphicsScene>
+# include  <QMessageBox>
 # include  <QString>
 # include  "AstrobenchMain.h"
 # include  "StackItemWidget.h"
@@ -33,6 +35,7 @@ using namespace std;
 AstrobenchMain::AstrobenchMain(QWidget*parent)
 : QMainWindow(parent)
 {
+      project_ = 0;
       next_image_ = 0;
 
       ui.setupUi(this);
@@ -50,8 +53,14 @@ AstrobenchMain::AstrobenchMain(QWidget*parent)
       ui.tone_map_graph->setScene(tone_map_lut_scene_);
 
 	// Signals from the File menu
-      connect(ui.actionExport, SIGNAL(triggered()),
-	      SLOT(menu_export_slot_()));
+      connect(ui.actionNew_Project, SIGNAL(triggered()),
+	      SLOT(menu_new_project_slot_()));
+      connect(ui.actionOpen_Project, SIGNAL(triggered()),
+	      SLOT(menu_open_project_slot_()));
+      connect(ui.actionClose_Project, SIGNAL(triggered()),
+	      SLOT(menu_close_project_slot_()));
+      connect(ui.actionSaveImage, SIGNAL(triggered()),
+	      SLOT(menu_save_image_slot_()));
 
 	// Signals from the Stack Processing tab
       connect(ui.open_next_image_button, SIGNAL(clicked()),
@@ -68,6 +77,9 @@ AstrobenchMain::AstrobenchMain(QWidget*parent)
 
 AstrobenchMain::~AstrobenchMain()
 {
+	// Close the project if it is not already closed.
+      menu_close_project_slot_();
+
       if (next_image_) delete next_image_;
 
       for (list<StackItemWidget*>::const_iterator cur = stack_.begin()
@@ -76,7 +88,7 @@ AstrobenchMain::~AstrobenchMain()
       }
 }
 
-void AstrobenchMain::menu_export_slot_(void)
+void AstrobenchMain::menu_save_image_slot_(void)
 {
 	// If there is no stack, then give up now.
       if (stack_.size() == 0)

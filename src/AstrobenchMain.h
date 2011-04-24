@@ -20,7 +20,9 @@
  */
 
 # include  <qapplication.h>
+# include  <QDir>
 # include  <QMainWindow>
+# include  <QSettings>
 # include  <QString>
 # include  "ui_astrobench.h"
 # include  <vips/vips>
@@ -53,6 +55,11 @@ class AstrobenchMain : public QMainWindow {
 	// The user interface...
       Ui::AstrobenchMainWidget ui;
 
+	// Information about the current project, or nil if there is
+	// no open project.
+      QDir project_path_;
+      QSettings*project_;
+
 	// This is the initial number of pages in the stack box. It is
 	// used to know where stack images can go.
       int stack_box_count_;
@@ -80,7 +87,10 @@ class AstrobenchMain : public QMainWindow {
 
     private slots:
 	// menu action slots
-      void menu_export_slot_();
+      void menu_new_project_slot_();
+      void menu_open_project_slot_();
+      void menu_close_project_slot_();
+      void menu_save_image_slot_();
 	// Stack image tab slots
       void open_next_image_button_slot_();
       void stack_next_image_button_slot_();
