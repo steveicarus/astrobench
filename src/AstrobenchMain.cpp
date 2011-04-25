@@ -146,29 +146,8 @@ void AstrobenchMain::open_next_image_button_slot_(void)
       display_image(*next_image_);
 }
 
-void AstrobenchMain::stack_next_image_button_slot_()
+void AstrobenchMain::push_stack_item_(StackItemWidget*cur)
 {
-      if (next_image_ == 0)
-	    return;
-
-      if (project_ == 0) {
-	    QMessageBox::information(this, tr("No Project"),
-				     tr("Create or Open a project first."));
-	    return;
-      }
-
-      unsigned item_id = choose_unique_id_();
-
-	// Create a new StackItemWidget to hold the current image. Map
-	// that widget to an identifier code, and write that code to
-	// the project settings.
-      StackItemWidget*cur = new StackItemWidget(this, item_id);
-      ident_map_[cur->ident()] = cur;
-      project_->setValue(QString("items/%1").arg(cur->ident()), "present");
-
-	// Move the image to the StackItemWidget.
-      cur->set_image(next_path_, *next_image_);
-      next_image_ = 0;
 
 	// Get the previous and base images from the stack, if there
 	// are any. If I'm about to push the first image, then there
@@ -195,6 +174,34 @@ void AstrobenchMain::stack_next_image_button_slot_()
 	    cur->calculate_offset_from(base);
 	    cur->calculate_stack_from(prev);
       }
+}
+
+void AstrobenchMain::stack_next_image_button_slot_()
+{
+      if (next_image_ == 0)
+	    return;
+
+      if (project_ == 0) {
+	    QMessageBox::information(this, tr("No Project"),
+				     tr("Create or Open a project first."));
+	    return;
+      }
+
+      unsigned item_id = choose_unique_id_();
+
+	// Create a new StackItemWidget to hold the current image. Map
+	// that widget to an identifier code, and write that code to
+	// the project settings.
+      StackItemWidget*cur = new StackItemWidget(this, item_id);
+      ident_map_[cur->ident()] = cur;
+      project_->setValue(QString("items/%1").arg(cur->ident()), "present");
+
+	// Move the image to the StackItemWidget.
+      cur->set_image(next_path_, *next_image_);
+      next_image_ = 0;
+
+	// Push the item onto the stack.
+      push_stack_item_(cur);
 }
 
 void AstrobenchMain::tone_map_calculate_slot_()

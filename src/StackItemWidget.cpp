@@ -44,14 +44,13 @@ StackItemWidget::~StackItemWidget()
 {
 }
 
-void StackItemWidget::set_image(const QString&path, vips::VImage img)
+/*
+ * The initialize_from_image_ method takes the loaded image_ member
+ * and uses it to generate the various other default (generated) image
+ * members.
+ */
+void StackItemWidget::initialize_from_image_(const QString&path)
 {
-      QString fname = QString("item.%1.base.v").arg(ident_);
-      QString fpath = astromain_->project_root().filePath(fname);
-      VImage file (fpath.toStdString().c_str(), "w");
-      img.write(file);
-
-      image_ = file;
       processed_ = image_;
       accumulated_ = image_;
       accumulated_stats_ = accumulated_.stats();
@@ -65,6 +64,28 @@ void StackItemWidget::set_image(const QString&path, vips::VImage img)
 	    ref_tmp = image_.extract_bands(0,1);
 
       image_fwfft_ = ref_tmp.fwfft();
+}
+
+void StackItemWidget::set_image(const QString&path, vips::VImage img)
+{
+      QString fname = QString("item.%1.base.v").arg(ident_);
+      QString fpath = astromain_->project_root().filePath(fname);
+      VImage file (fpath.toStdString().c_str(), "w");
+      img.write(file);
+
+      image_ = file;
+      initialize_from_image_(path);
+}
+
+void StackItemWidget::recover_data(void)
+{
+      QString fname = QString("item.%1.base.v").arg(ident_);
+      assert(astromain_->project_root().exists(fname));
+      QString fpath = astromain_->project_root().filePath(fname);
+
+      VImage file (fpath.toStdString().c_str(), "r");
+      image_ = file;
+      initialize_from_image_(fname);
 }
 
 void StackItemWidget::calculate_offset_from(StackItemWidget*that)

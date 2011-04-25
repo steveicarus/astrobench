@@ -39,6 +39,11 @@ class StackItemWidget  : public QWidget {
 	// Set the raw image for this item.
       void set_image(const QString&path, vips::VImage img);
 
+	// If opening an existing project, this method is used in
+	// place of the set_image method to recover the image from the
+	// image file.
+      void recover_data();
+
 	// Calculate the offset of this image from the image argument,
 	// which is expected to the be base image.
       void calculate_offset_from(StackItemWidget*that);
@@ -54,6 +59,9 @@ class StackItemWidget  : public QWidget {
       void display_raw_slot_(void);
       void display_aligned_slot_(void);
       void display_stacked_slot_(void);
+
+    private:
+      void initialize_from_image_(const QString&path);
 
     private:
       Ui::StackItem ui;

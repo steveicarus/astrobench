@@ -92,6 +92,8 @@ class AstrobenchMain : public QMainWindow {
 
     private: // Image processing function implementations
 
+      void push_stack_item_(StackItemWidget*item);
+
       template <class T> static void do_tone_map_(void*pin, void*pout, int wid, void*a, void*b);
 
     private slots:

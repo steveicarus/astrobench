@@ -144,6 +144,43 @@ void AstrobenchMain::menu_open_project_slot_(void)
 
       QString settings_path = project_path_.filePath(ASTRO_PROJECT_INI);
       project_ = new QSettings(settings_path, QSettings::IniFormat);
+
+	// Get the list of known items as a collection of keys under
+	// the "items" group.
+      project_->beginGroup("items");
+      QStringList items = project_->childKeys();
+      project_->endGroup();
+
+	// Create all the StackItemWidgets for all the listed items.
+      for (int idx = 0 ; idx < items.size() ; idx += 1) {
+	    QString item_str = items[idx];
+	    bool ok_flag = true;
+	    unsigned item_id = item_str.toUInt(&ok_flag, 10);
+	    assert(ok_flag);
+
+	    StackItemWidget*cur = new StackItemWidget(this, item_id);
+	    ident_map_[cur->ident()] = cur;
+
+	    printf("XXXX recover image %u\n", cur->ident());
+	    cur->recover_data();
+      }
+
+	// First recover the base image and push it to the stack.
+      unsigned base_id = project_->value("base_image").toUInt();
+      printf("XXXX Use image %u as the base image\n", base_id);
+      StackItemWidget*base = ident_map_[base_id];
+      assert(base);
+      push_stack_item_(base);
+
+	// Now push all the remaining images to the stack.
+      for (map<unsigned,StackItemWidget*>::iterator cur = ident_map_.begin()
+		 ; cur != ident_map_.end() ; ++cur) {
+	    if (cur->second == base)
+		  continue;
+
+	    printf("XXXX Push image %u\n", cur->first);
+	    push_stack_item_(cur->second);
+      }
 }
 
 void AstrobenchMain::menu_close_project_slot_(void)
@@ -155,4 +192,19 @@ void AstrobenchMain::menu_close_project_slot_(void)
       delete project_;
       project_ = 0;
       project_path_ = QString();
+
+	// Empth the object stack.
+      stack_.clear();
+
+	// Clear the items from the toolbox
+      while (ui.stack_box->count() > stack_box_count_) {
+	    ui.stack_box->removeItem(stack_box_count_);
+      }
+
+	// Clear the ident_map_ map.
+      for (map<unsigned,StackItemWidget*>::iterator cur = ident_map_.begin()
+		 ; cur != ident_map_.end() ; ++cur) {
+	    delete cur->second;
+      }
+      ident_map_.clear();
 }
