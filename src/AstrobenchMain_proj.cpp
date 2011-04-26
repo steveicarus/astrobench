@@ -118,6 +118,7 @@ void AstrobenchMain::menu_open_project_slot_(void)
 
       QFileDialog selector(this, tr("Select an existing project"));
       selector.setFilter(QDir::Dirs);
+      selector.setFileMode(QFileDialog::Directory);
       selector.setNameFilter("Icarus AstroBench project (*.iab)");
 
       int rc = selector.exec();
@@ -134,6 +135,13 @@ void AstrobenchMain::menu_open_project_slot_(void)
 	// Check that the directory exists, and that it contains
 	// sensible project files. Then open the project.
       project_path_ = files[0];
+      if (! project_path_.exists()) {
+	    QMessageBox::information(this, tr("Internal Error"),
+				     tr("Selected path [%1] doesn't exist.").arg(project_path_.path()));
+	    project_path_ = QString();
+	    return;
+      }
+
       assert(project_path_.exists());
       if (!project_path_.exists(ASTRO_PROJECT_INI)) {
 	    QMessageBox::information(this, tr("Error"),
@@ -161,16 +169,22 @@ void AstrobenchMain::menu_open_project_slot_(void)
 	    StackItemWidget*cur = new StackItemWidget(this, item_id);
 	    ident_map_[cur->ident()] = cur;
 
+	    QString use_label = project_->value(QString("items/")+item_str).toString();
 	    printf("XXXX recover image %u\n", cur->ident());
-	    cur->recover_data();
+	    cur->recover_data(use_label);
       }
 
-	// First recover the base image and push it to the stack.
-      unsigned base_id = project_->value("base_image").toUInt();
-      printf("XXXX Use image %u as the base image\n", base_id);
-      StackItemWidget*base = ident_map_[base_id];
-      assert(base);
-      push_stack_item_(base);
+	// First recover the base image and push it to the
+	// stack. Defensively catch the case that this is an empty
+	// project.
+      StackItemWidget*base = 0;
+      if (ident_map_.size() > 0) {
+	    unsigned base_id = project_->value("base_image").toUInt();
+	    printf("XXXX Use image %u as the base image\n", base_id);
+	    base = ident_map_[base_id];
+	    assert(base);
+	    push_stack_item_(base);
+      }
 
 	// Now push all the remaining images to the stack.
       for (map<unsigned,StackItemWidget*>::iterator cur = ident_map_.begin()

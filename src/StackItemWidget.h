@@ -37,12 +37,12 @@ class StackItemWidget  : public QWidget {
       unsigned ident() const { return ident_; }
 
 	// Set the raw image for this item.
-      void set_image(const QString&path, vips::VImage img);
+      void set_image(const QString&use_label, vips::VImage img);
 
 	// If opening an existing project, this method is used in
 	// place of the set_image method to recover the image from the
 	// image file.
-      void recover_data();
+      void recover_data(const QString&use_label);
 
 	// Calculate the offset of this image from the image argument,
 	// which is expected to the be base image.

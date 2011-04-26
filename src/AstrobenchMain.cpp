@@ -27,6 +27,7 @@
 # include  <QString>
 # include  "AstrobenchMain.h"
 # include  "StackItemWidget.h"
+# include  <iostream>
 # include  <cassert>
 
 using namespace vips;
@@ -194,7 +195,7 @@ void AstrobenchMain::stack_next_image_button_slot_()
 	// the project settings.
       StackItemWidget*cur = new StackItemWidget(this, item_id);
       ident_map_[cur->ident()] = cur;
-      project_->setValue(QString("items/%1").arg(cur->ident()), "present");
+      project_->setValue(QString("items/%1").arg(cur->ident()), next_path_);
 
 	// Move the image to the StackItemWidget.
       cur->set_image(next_path_, *next_image_);

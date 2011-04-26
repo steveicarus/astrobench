@@ -20,8 +20,10 @@
 # include  "StackItemWidget.h"
 # include  "AstrobenchMain.h"
 # include  <stdio.h>
+# include  <iostream>
 # include  <cassert>
 
+using namespace std;
 using namespace vips;
 
 StackItemWidget::StackItemWidget(AstrobenchMain*am, unsigned id, QWidget*parent)
@@ -49,13 +51,14 @@ StackItemWidget::~StackItemWidget()
  * and uses it to generate the various other default (generated) image
  * members.
  */
-void StackItemWidget::initialize_from_image_(const QString&path)
+void StackItemWidget::initialize_from_image_(const QString&use_label)
 {
+      accumulated_stats_ = VDMask();
+
       processed_ = image_;
       accumulated_ = image_;
-      accumulated_stats_ = accumulated_.stats();
-      ui.stack_item_path->setText(path);
-      ui.stack_item_path->setToolTip(path);
+      ui.stack_item_path->setText(use_label);
+      ui.stack_item_path->setToolTip(use_label);
 
       vips::VImage ref_tmp;
       if (image_.Bands() == 3)
@@ -66,7 +69,7 @@ void StackItemWidget::initialize_from_image_(const QString&path)
       image_fwfft_ = ref_tmp.fwfft();
 }
 
-void StackItemWidget::set_image(const QString&path, vips::VImage img)
+void StackItemWidget::set_image(const QString&use_label, vips::VImage img)
 {
       QString fname = QString("item.%1.base.v").arg(ident_);
       QString fpath = astromain_->project_root().filePath(fname);
@@ -74,10 +77,10 @@ void StackItemWidget::set_image(const QString&path, vips::VImage img)
       img.write(file);
 
       image_ = file;
-      initialize_from_image_(path);
+      initialize_from_image_(use_label);
 }
 
-void StackItemWidget::recover_data(void)
+void StackItemWidget::recover_data(const QString&use_label)
 {
       QString fname = QString("item.%1.base.v").arg(ident_);
       assert(astromain_->project_root().exists(fname));
@@ -85,7 +88,7 @@ void StackItemWidget::recover_data(void)
 
       VImage file (fpath.toStdString().c_str(), "r");
       image_ = file;
-      initialize_from_image_(fname);
+      initialize_from_image_(use_label);
 }
 
 void StackItemWidget::calculate_offset_from(StackItemWidget*that)
@@ -166,6 +169,8 @@ const VImage& StackItemWidget::accumulated_image(void) const
 
 unsigned StackItemWidget::accumulated_pixel_max()
 {
+      if (accumulated_stats_.size() == 0)
+	    accumulated_stats_ = accumulated_.stats();
       return accumulated_stats_(1,0);
 }
 
